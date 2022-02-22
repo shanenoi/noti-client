@@ -2,26 +2,24 @@ import logo from './logo.svg';
 import React from 'react';
 import './App.css';
 import {useState} from 'react';
-import { getToken, onMessageListener, messaging } from './firebase';
+import { getToken, onMessageListener } from './firebase';
 import {Button, Toast} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-async function showToken(setTokenFound) {
-  var token = await getToken(setTokenFound);
-  console.log(token);
-}
-
 function App() {
-
   const [show, setShow] = useState(false);
   const [notification, setNotification] = useState({title: '', body: ''});
   const [isTokenFound, setTokenFound] = useState(false);
-  showToken(setTokenFound);
-  console.log("+> " + messaging.getToken(a => console.log("-->", a)));
+  Notification.requestPermission(_ => {
+    getToken(setTokenFound)
+  })
 
   onMessageListener().then(payload => {
     setShow(true);
-    setNotification({title: payload.notification.title, body: payload.notification.body})
+    setNotification({
+      title: payload.notification.title,
+      body: payload.notification.body
+    })
     console.log(payload);
   }).catch(err => console.log('failed: ', err));
 
@@ -34,7 +32,7 @@ function App() {
           minWidth: 200
         }}>
           <Toast.Header>
-            <img
+            <span
               src="holder.js/20x20?text=%20"
               className="rounded mr-2"
               alt=""
@@ -44,10 +42,11 @@ function App() {
           </Toast.Header>
           <Toast.Body>{notification.body}</Toast.Body>
         </Toast>
+      <b id="token"></b>
       <header className="App-header">
-        {isTokenFound && <h1> Notification permission enabled 👍🏻 </h1>}
-        {!isTokenFound && <h1> Need notification permission ❗️ </h1>}
-        <img src={logo} className="App-logo" alt="logo" />
+        {isTokenFound && <h1> Notification permission enabled</h1>}
+        {!isTokenFound && <h1> Need notification permission</h1>}
+        <span src={logo} className="App-logo" alt="logo" />
         <Button onClick={() => setShow(true)}>Show Toast</Button>
       </header>
       
